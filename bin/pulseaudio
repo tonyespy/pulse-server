@@ -9,7 +9,8 @@ if [ -e "$SNAP_DATA"/config/debug ] ; then
     export LIBASOUND_DEBUG=1
 fi
 
-PA_MODULES="$(ls -d $SNAP/usr/lib/pulse-*)/modules"
+LD_LIBRARY_PATH="$LD_LIBRARY_PATH:$SNAP/usr/lib/pulseaudio:$SNAP/usr/lib/pulseaudio/modules"
+PA_MODULES="$SNAP/usr/lib/pulseaudio/modules"
 
 sleep 1
 
@@ -17,7 +18,8 @@ exec "$SNAP"/usr/bin/pulseaudio \
     --exit-idle-time=-1 \
     --disallow-exit=yes \
     --system \
-    -F "$SNAP"/etc/pulse/default.pa \
     -p $PA_MODULES \
+    -L module-always-sink \
+    -L module-native-protocol-unix \
     -n \
     "${EXTRA_ARGS[@]}"

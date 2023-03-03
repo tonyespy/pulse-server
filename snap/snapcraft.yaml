@@ -57,7 +57,6 @@ plugs:
     interface: audio-record
 
 environment:
-  LD_LIBRARY_PATH: "$SNAP/usr/lib/pulseaudio:$SNAP/usr/lib/alsa-lib"
   PULSE_RUNTIME_PATH: /var/run/pulse
   PULSE_STATE_PATH: $SNAP_COMMON/state
   ALSA_CONFIG_UCM: $SNAP/usr/share/alsa/ucm2
