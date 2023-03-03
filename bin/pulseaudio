@@ -19,7 +19,6 @@ exec "$SNAP"/usr/bin/pulseaudio \
     --disallow-exit=yes \
     --system \
     -p $PA_MODULES \
-    -L module-always-sink \
-    -L module-native-protocol-unix \
+    -F $SNAP/etc/pulse/system.pa \
     -n \
     "${EXTRA_ARGS[@]}"
