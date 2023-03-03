@@ -8,7 +8,7 @@ description: |
 
 grade: stable
 confinement: strict
-base: core20
+base: core22
 compression: lzo
 
 apps:
@@ -104,7 +104,7 @@ parts:
   pulseaudio:
     plugin: meson
     source: https://github.com/pulseaudio/pulseaudio.git
-    source-tag: v15.0
+    source-tag: v15.99.1
     source-depth: 1
     after: [ alsa-lib ]
     build-packages:
@@ -125,6 +125,7 @@ parts:
       - libsbc-dev
       - libsnapd-glib-dev
       - libsoxr-dev
+      - meson
     stage-packages:
       - libapparmor1
       - libasyncns0
@@ -132,7 +133,7 @@ parts:
       - libflac8
       - libglib2.0-0
       - libgomp1
-      - libjson-c4
+      - libjson-c5
       - libltdl7
       - libogg0
       - libsbc1
@@ -146,25 +147,25 @@ parts:
       - libvorbis0a
       - libvorbisenc2
     meson-parameters:
-      - --prefix="/usr"
+      - --prefix=/usr
       - --sysconfdir=/etc
       - --libexec=/usr/lib
       - --libdir=/usr/lib
       - --localstatedir=/var
-      - -Dgstreamer="disabled"
-      - -Dbluez5-gstreamer="disabled"
-      - -Dorc="disabled"
-      - -Dgsettings="disabled"
-      - -Dadrian-aec="false"
-      - -Dgtk="disabled"
-      - -Dhal-compat="false"
-      - -Dwebrtc-aec="disabled"
-      - -Doss-output="disabled"
-      - -Djack="disabled"
-      - -Dx11="disabled"
-      - -Dsystem_user="root"
-      - -Dsystem_group="root"
-      - -Daccess_group="root"
+      - -Dgstreamer=disabled
+      - -Dbluez5-gstreamer=disabled
+      - -Dorc=disabled
+      - -Dgsettings=disabled
+      - -Dadrian-aec=false
+      - -Dgtk=disabled
+      - -Dhal-compat=false
+      - -Dwebrtc-aec=disabled
+      - -Doss-output=disabled
+      - -Djack=disabled
+      - -Dx11=disabled
+      - -Dsystem_user=root
+      - -Dsystem_group=root
+      - -Daccess_group=root
     override-build: |
       snapcraftctl build
       VER=$(cd $SNAPCRAFT_PART_SRC; git tag|sed 's/^v//')
