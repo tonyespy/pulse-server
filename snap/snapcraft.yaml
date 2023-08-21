@@ -60,7 +60,6 @@ environment:
   PULSE_RUNTIME_PATH: /var/run/pulse
   PULSE_STATE_PATH: $SNAP_COMMON/state
   ALSA_CONFIG_UCM: $SNAP/usr/share/alsa/ucm2
-  ALSA_CONFIG_TPLG: $SNAP/usr/share/alsa/topology
   ALSA_CONFIG_PATH: $SNAP/usr/share/alsa/alsa.conf
   ALSA_MIXER_SIMPLE: $SNAP/usr/share/alsa/smixer.conf
   ALSA_PLUGIN_DIR: $SNAP/usr/lib/alsa-lib
@@ -100,6 +99,7 @@ parts:
       - -usr/share/aclocal
       - -usr/lib/lib*.la
       - -usr/lib/pkgconfig
+      - -usr/lib/libatopology*
   pulseaudio:
     plugin: meson
     source: https://github.com/pulseaudio/pulseaudio.git
@@ -172,8 +172,11 @@ parts:
       - -usr/share/vala
       - -usr/libexec
       - -usr/lib/cmake
+      - -usr/lib/libpulse-mainloop-glib*
+      - -usr/lib/libpulse-simple*
       - -usr/lib/pkgconfig
       - -usr/lib/systemd
+      - -usr/lib/**/libgthread*
       - -etc/dconf
   alsa-plugins:
     plugin: autotools
