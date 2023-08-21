@@ -166,12 +166,12 @@ parts:
       - -Dsystem_group=root
       - -Daccess_group=root
     override-build: |
-      snapcraftctl build
+      craftctl default
       VER=$(cd $SNAPCRAFT_PART_SRC; git tag|sed 's/^v//')
-      snapcraftctl set-version $VER
+      craftctl set version=$VER
       mkdir -p $SNAPCRAFT_PART_INSTALL/usr/share/applications
     override-prime: |
-      snapcraftctl prime
+      craftctl default
       find usr/share/doc/ -type f,l ! -name copyright | xargs rm -rf
     prime:
       - -usr/include
@@ -198,7 +198,7 @@ parts:
     prime:
       - -usr/lib/alsa-lib/*.la
     override-prime: |
-      snapcraftctl prime
+      craftctl default
       # make links relative
       cd etc/alsa/conf.d
       for link in $(find . -type l); do
