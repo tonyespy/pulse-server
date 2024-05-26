@@ -15,7 +15,6 @@ apps:
   pulseaudio:
     command: bin/pulseaudio
     daemon: simple
-    install-mode: disable
     plugs:
       - alsa
       - bluez
@@ -25,6 +24,7 @@ apps:
     slots:
       - audio-playback
       - audio-record
+      - dbus-svc
   pactl:
     command-chain: [bin/client-wrapper]
     command: usr/bin/pactl
@@ -56,10 +56,17 @@ plugs:
   record:
     interface: audio-record
 
+slots:
+  dbus-svc:
+    interface: dbus
+    bus: system
+    name: org.pulseaudio.Server
+
 environment:
   PULSE_RUNTIME_PATH: /var/run/pulse
   PULSE_STATE_PATH: $SNAP_COMMON/state
   ALSA_CONFIG_UCM: $SNAP/usr/share/alsa/ucm2
+  ALSA_CONFIG_TPLG: $SNAP/usr/share/alsa/topology
   ALSA_CONFIG_PATH: $SNAP/usr/share/alsa/alsa.conf
   ALSA_MIXER_SIMPLE: $SNAP/usr/share/alsa/smixer.conf
   ALSA_PLUGIN_DIR: $SNAP/usr/lib/alsa-lib
@@ -71,8 +78,8 @@ layout:
     bind: $SNAP/etc/alsa
   /var/lib/pulse:
     bind: $SNAP_DATA
-  /usr/lib/pulse-15.0:
-    symlink: $SNAP/usr/lib/pulse-15.0
+  /usr/lib/pulseaudio:
+    symlink: $SNAP/usr/lib/pulseaudio
   /usr/lib/alsa-lib:
     bind: $SNAP/usr/lib/alsa-lib
   /usr/share/pulseaudio:
@@ -93,40 +100,45 @@ parts:
   alsa-lib:
     plugin: autotools
     source: https://github.com/alsa-project/alsa-lib.git
-    source-tag: v1.2.5.1
+    source-tag: v1.2.11
     prime:
       - -usr/include
       - -usr/share/aclocal
+      - -usr/lib/libatopology*
       - -usr/lib/lib*.la
       - -usr/lib/pkgconfig
-      - -usr/lib/libatopology*
   pulseaudio:
     plugin: meson
     source: https://github.com/pulseaudio/pulseaudio.git
-    source-tag: v15.99.1
+    source-tag: v17.0
     source-depth: 1
     after: [ alsa-lib ]
     build-packages:
       - check
       - doxygen
       - intltool
+      - libapparmor-dev
       - libdbus-1-dev
+      - libjson-c-dev
       - libglib2.0-dev
       - libspeexdsp-dev
+      - libbluetooth-dev
       - libltdl-dev
       - libsndfile1-dev
       - libtdb-dev
       - libudev-dev
       - libasyncns-dev
+      - libsbc-dev
+      - libsnapd-glib-dev
       - libsoxr-dev
       - meson
     stage-packages:
       - libasyncns0
       - libflac8
-      - libglib2.0-0
       - libgomp1
       - libltdl7
       - libogg0
+      - libsbc1
       - libsndfile1
       - libsoxr0
       - libspeexdsp1
@@ -161,6 +173,8 @@ parts:
       mkdir -p $SNAPCRAFT_PART_INSTALL/usr/share/applications
     override-prime: |
       craftctl default
+      echo "load-module module-switch-on-connect" >> etc/pulse/system.pa
+      sed --in-place "s/user=\"pulse\"/user=\"root\"/" usr/share/dbus-1/system.d/pulseaudio-system.conf
       find usr/share/doc/ -type f,l ! -name copyright | xargs rm -rf
     prime:
       - -usr/include
@@ -176,12 +190,11 @@ parts:
       - -usr/lib/libpulse-simple*
       - -usr/lib/pkgconfig
       - -usr/lib/systemd
-      - -usr/lib/**/libgthread*
       - -etc/dconf
   alsa-plugins:
     plugin: autotools
     source: https://github.com/alsa-project/alsa-plugins.git
-    source-tag: v1.2.5
+    source-tag: v1.2.7.1
     after: [ pulseaudio, alsa-lib ]
     autotools-configure-parameters:
       - --prefix=/usr
@@ -201,11 +214,13 @@ parts:
   alsa-ucm:
     plugin: dump
     source: https://github.com/alsa-project/alsa-ucm-conf.git
-    source-tag: v1.2.5.1
+    source-tag: v1.2.11
     after: [ alsa-plugins ]
     organize:
       ucm: usr/share/alsa/ucm
       ucm2: usr/share/alsa/ucm2
     prime:
       - -README.md
-
+      - -VERSION
+      - -*/**/*.md
+      - -*/**/*.gitignore
