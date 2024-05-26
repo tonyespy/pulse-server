@@ -15,7 +15,6 @@ apps:
   pulseaudio:
     command: bin/pulseaudio
     daemon: simple
-    install-mode: disable
     plugs:
       - alsa
       - bluez
@@ -25,6 +24,7 @@ apps:
     slots:
       - audio-playback
       - audio-record
+      - dbus-svc
   pactl:
     command-chain: [bin/client-wrapper]
     command: usr/bin/pactl
@@ -55,6 +55,12 @@ plugs:
     interface: audio-playback
   record:
     interface: audio-record
+
+slots:
+  dbus-svc:
+    interface: dbus
+    bus: system
+    name: org.pulseaudio.Server
 
 environment:
   PULSE_RUNTIME_PATH: /var/run/pulse
@@ -97,9 +103,9 @@ parts:
     prime:
       - -usr/include
       - -usr/share/aclocal
+      - -usr/lib/libatopology*
       - -usr/lib/lib*.la
       - -usr/lib/pkgconfig
-      - -usr/lib/libatopology*
   pulseaudio:
     plugin: meson
     source: https://github.com/pulseaudio/pulseaudio.git
@@ -161,6 +167,8 @@ parts:
       mkdir -p $SNAPCRAFT_PART_INSTALL/usr/share/applications
     override-prime: |
       craftctl default
+      echo "load-module module-switch-on-connect" >> etc/pulse/system.pa
+      sed --in-place "s/user=\"pulse\"/user=\"root\"/" etc/dbus-1/system.d/pulseaudio-system.conf
       find usr/share/doc/ -type f,l ! -name copyright | xargs rm -rf
     prime:
       - -usr/include
@@ -208,4 +216,6 @@ parts:
       ucm2: usr/share/alsa/ucm2
     prime:
       - -README.md
-
+      - -VERSION
+      - -*/**/*.md
+      - -*/**/*.gitignore

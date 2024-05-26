@@ -10,7 +10,7 @@ if [ -e "$SNAP_DATA"/config/debug ] ; then
 fi
 
 LD_LIBRARY_PATH="$LD_LIBRARY_PATH:$SNAP/usr/lib/pulseaudio:$SNAP/usr/lib/pulseaudio/modules"
-PA_MODULES="$SNAP/usr/lib/pulseaudio/modules"
+PA_MODULES="$SNAP"/usr/lib/pulseaudio/modules
 
 sleep 1
 
